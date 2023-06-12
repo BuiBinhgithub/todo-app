@@ -1,0 +1,89 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+::-webkit-input-placeholder {
+    font-style: italic;
+}
+
+:-moz-placeholder {
+    font-style: italic;
+}
+
+::-moz-placeholder {
+    font-style: italic;
+}
+
+:-ms-input-placeholder {
+    font-style: italic;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+}
+
+.todo-container {
+    max-width: 600px;
+    margin: 207px auto;
+}
+
+h1 {
+    text-align: center;
+}
+
+input {
+    margin-top: 10px;
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid #EEEEEE;
+    border-radius: 5px;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px;
+}
+
+.li-checkbox {
+    display: flex;
+}
+
+li input[type="checkbox"] {
+    margin: 0;
+    width: 24px;
+    height: 24px;
+}
+
+li input[type="checkbox"]:checked::before {
+    background-color: yellow;
+    color: #000;
+}
+
+li span {
+    font-size: 14px;
+    font-weight: 400;
+    margin-top: 6px;
+}
+
+
+
+.delete-button {
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: 600;
+    font-size: 14px;
+    color: #E03600;
+}
+
+.delete-button:hover {
+    cursor: pointer;
+}
