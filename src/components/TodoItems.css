@@ -49,6 +49,16 @@
     transform: rotate(45deg);
 }
 
+.delete-button {
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: 600;
+    font-size: 14px;
+    color: #E03600;
+    border: none;
+    background-color: rgb(255, 250, 237);
+}
+
 .checkbox-container input:checked~.checkmark:after {
     border-color: black;
 }

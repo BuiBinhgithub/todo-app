@@ -1,13 +1,14 @@
-import React from 'react';
 import { Todo } from '../services/todo-service';
 import './TodoItems.css'
 interface Props {
     todos: Todo[],
-    onChange: (id: number) => void
+
+    isDeleting: boolean,
+    onChange: (id: number) => void,
     onDelete: (id: number) => void
 }
 
-function TodoItems({ todos, onChange, onDelete }: Props) {
+function TodoItems({ todos, onChange, onDelete, isDeleting }: Props) {
 
     return (
         <ul>
@@ -21,7 +22,9 @@ function TodoItems({ todos, onChange, onDelete }: Props) {
                         </label>
                         <span style={{ textDecoration: todo.completed ? 'line-through' : 'none' }}>{todo.title}</span>
                     </div>
-                    <span className='delete-button' onClick={() => onDelete(todo.id)}>Delete</span>
+
+                    <button disabled={isDeleting} className='delete-button' onClick={() => onDelete(todo.id)}>Delete</button>
+
                 </li>
             )
             )}

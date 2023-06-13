@@ -26,7 +26,7 @@ function App() {
     }
   }
   const handleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' && newTodoTitle.trim() !== "") {
       e.preventDefault()
       await addTodo()
       setLoading(false)
@@ -40,7 +40,7 @@ function App() {
         order: 1
       })
       const newData = res.data
-      setTodos([...todos, newData])
+      setTodos([newData, ...todos])
       setNewTodoTitle('')
       setLoading(false)
     }
@@ -60,9 +60,9 @@ function App() {
       console.log(err.message);
     }
   }
-  const deleteTodo = async (id: number) => {
+  const deleteTodo = (id: number) => {
     try {
-      await todoService.delete(id)
+      todoService.delete(id)
       const filterTodos = todos.filter((t) => t.id !== id)
       setTodos(filterTodos)
       setLoading(false)
@@ -71,8 +71,6 @@ function App() {
       console.log(err.message);
     }
   }
-
-
 
   return (
     <>
