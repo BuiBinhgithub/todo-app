@@ -1,45 +1,40 @@
 import { useEffect, useState } from 'react'
 import './App.css'
-import axios from 'axios'
 import TodoItems from './components/TodoItems'
-
-
-export interface Todo {
-  id: number,
-  order: number,
-  completed: boolean,
-  title: string
-}
+import apiService from './services/api-service'
+import todoService, { Todo } from './services/todo-service'
 
 
 function App() {
   const [todos, setTodos] = useState<Todo[]>([])
   const [newTodoTitle, setNewTodoTitle] = useState<string>('')
-  const [isChecked, setIsChecked] = useState(false)
-
+  const [loading, setLoading] = useState<boolean>(true)
   useEffect(() => {
     fetchTodos();
   }, [])
 
   const fetchTodos = async () => {
     try {
-      const res = await axios.get('https://64867c0cbeba6297278ed1ef.mockapi.io/api/events')
+      const res = await todoService.getAll<Todo>()
       const todoData = res.data
       setTodos(todoData)
+      setLoading(false)
     }
     catch (err: any) {
       console.log(err.message);
+      setLoading(false)
     }
   }
   const handleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault()
       await addTodo()
+      setLoading(false)
     }
   }
   const addTodo = async () => {
     try {
-      const res = await axios.post('https://64867c0cbeba6297278ed1ef.mockapi.io/api/events', {
+      const res = await todoService.add({
         title: newTodoTitle,
         completed: false,
         order: 1
@@ -47,6 +42,7 @@ function App() {
       const newData = res.data
       setTodos([...todos, newData])
       setNewTodoTitle('')
+      setLoading(false)
     }
     catch (err: any) {
       console.log(err.message);
@@ -58,7 +54,7 @@ function App() {
         todo.id === id ? { ...todo, completed: !todo.completed } : todo
       );
       setTodos(updatedTodos)
-      axios.put('https://64867c0cbeba6297278ed1ef.mockapi.io/api/events/' + id, { completed: updatedTodos.find((todo) => todo.id === id)?.completed })
+      apiService.put('/events/' + id, { completed: updatedTodos.find((todo) => todo.id === id)?.completed })
     }
     catch (err: any) {
       console.log(err.message);
@@ -66,9 +62,10 @@ function App() {
   }
   const deleteTodo = async (id: number) => {
     try {
-      await axios.delete('https://64867c0cbeba6297278ed1ef.mockapi.io/api/events/' + id)
+      await todoService.delete(id)
       const filterTodos = todos.filter((t) => t.id !== id)
       setTodos(filterTodos)
+      setLoading(false)
     }
     catch (err: any) {
       console.log(err.message);
@@ -79,6 +76,7 @@ function App() {
 
   return (
     <>
+      {loading && <p>loading...</p>}
       <div className="wrapper">
         <div className='todo-container'>
           <h1>todos</h1>

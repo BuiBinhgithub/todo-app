@@ -1,14 +1,13 @@
 import React from 'react';
-import { Todo } from '../App';
+import { Todo } from '../services/todo-service';
 import './TodoItems.css'
 interface Props {
-    isChecked: boolean,
     todos: Todo[],
     onChange: (id: number) => void
     onDelete: (id: number) => void
 }
 
-function TodoItems({ todos, onChange, onDelete, isChecked }: Props) {
+function TodoItems({ todos, onChange, onDelete }: Props) {
 
     return (
         <ul>
