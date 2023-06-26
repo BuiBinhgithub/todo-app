@@ -2,7 +2,6 @@ import { Todo } from '../services/todo-service';
 import './TodoItems.css'
 interface Props {
     todos: Todo[],
-
     isDeleting: boolean,
     onChange: (id: number) => void,
     onDelete: (id: number) => void
