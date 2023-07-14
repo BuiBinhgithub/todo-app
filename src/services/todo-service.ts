@@ -2,10 +2,9 @@
 import create from "./http-service";
 
 export interface Todo {
-    isActive: any;
     id: number,
     order: number,
-    completed: boolean,
+    isActive: boolean,
     title: string
 }
 

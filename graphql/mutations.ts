@@ -19,11 +19,11 @@ export const DELETE_TODO = gql`
 `;
 
 export const UPDATE_TODO = gql`
-  mutation UpdateTodo($input: UpdateTodoInput!) {
-    updateTodo(input: $input) {
+  mutation ($title: String!, $id: String!, $isActive: Boolean!) {
+    updateTodo(input: { id: $id, title: $title, isActive: $isActive }) {
       id
+      title
       isActive
-      updatedAt
     }
   }
 `;
