@@ -1,95 +1,82 @@
-import { useEffect, useState } from 'react'
-import './App.css'
-import TodoItems from './components/TodoItems'
-import apiService from './services/api-service'
-import todoService, { Todo } from './services/todo-service'
-
-
+import { useEffect, useState } from "react";
+import "./App.css";
+import TodoItems from "./components/TodoItems";
+import { Todo } from "./services/todo-service";
+import { useMutation, useQuery } from "@apollo/client";
+import { GET_ALL_TODOS } from "../graphql/queries";
+import { CREATE_TODO, DELETE_TODO, UPDATE_TODO } from "../graphql/mutations";
 function App() {
-  const [todos, setTodos] = useState<Todo[]>([])
-  const [newTodoTitle, setNewTodoTitle] = useState<string>('')
-  const [loading, setLoading] = useState<boolean>(true)
-  useEffect(() => {
-    fetchTodos();
-  }, [])
+  const { data, error, loading } = useQuery(GET_ALL_TODOS);
+  const [createTodo] = useMutation(CREATE_TODO, {
+    onCompleted: (res) => {
+      const newData = res.createTodo;
+      setTodos((prev) => [newData, ...prev]);
+      setTitle("");
+      console.log(newData);
+    },
+  });
+  const [updateTodo] = useMutation(UPDATE_TODO);
+  const [removeTodo] = useMutation(DELETE_TODO);
+  const [todos, setTodos] = useState<Todo[]>([]);
+  const [title, setTitle] = useState<string>("");
 
-  const fetchTodos = async () => {
-    try {
-      const res = await todoService.getAll<Todo>()
-      const todoData = res.data
-      setTodos(todoData)
-      setLoading(false)
+  useEffect(() => {
+    if (data) {
+      setTodos(data.listTodo);
     }
-    catch (err: any) {
-      console.log(err.message);
-      setLoading(false)
+    if (error) {
+      console.log(error);
     }
-  }
-  const handleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && newTodoTitle.trim() !== "") {
-      e.preventDefault()
-      await addTodo()
-      setLoading(false)
+  }, [data]);
+
+  const addTodo = async (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && title.trim() !== "") {
+      createTodo({ variables: { title } });
     }
-  }
-  const addTodo = async () => {
-    try {
-      const res = await todoService.add({
-        title: newTodoTitle,
-        completed: false,
-        order: 1
-      })
-      const newData = res.data
-      setTodos([newData, ...todos])
-      setNewTodoTitle('')
-      setLoading(false)
-    }
-    catch (err: any) {
-      console.log(err.message);
-    }
-  }
+  };
   const handleCheckboxChange = (id: number) => {
-    try {
-      const updatedTodos = todos.map((todo) =>
-        todo.id === id ? { ...todo, completed: !todo.completed } : todo
-      );
-      setTodos(updatedTodos)
-      apiService.put('/events/' + id, { completed: updatedTodos.find((todo) => todo.id === id)?.completed })
+    const updatedTodos = todos.map((todo) =>
+      todo.id === id ? { ...todo, isActive: !todo.isActive } : todo
+    );
+    setTodos(updatedTodos);
+    const todoToUpdate = updatedTodos.find((todo) => todo.id === id);
+    if (todoToUpdate) {
+      updateTodo({
+        variables: { id: todoToUpdate.id, isActive: todoToUpdate.isActive },
+      });
     }
-    catch (err: any) {
-      console.log(err.message);
-    }
-  }
+  };
   const deleteTodo = (id: number) => {
-    try {
-      todoService.delete(id)
-      const filterTodos = todos.filter((t) => t.id !== id)
-      setTodos(filterTodos)
-      setLoading(false)
-    }
-    catch (err: any) {
-      console.log(err.message);
-    }
-  }
+    removeTodo({ variables: { id } });
+    const filterTodos = todos.filter((t) => t.id !== id);
+    setTodos(filterTodos);
+  };
 
   return (
     <>
-      {loading && <p>loading...</p>}
       <div className="wrapper">
-        <div className='todo-container'>
+        <div className="todo-container">
           <h1>todos</h1>
           <input
             type="text"
-            value={newTodoTitle}
-            onChange={(e) => setNewTodoTitle(e.target.value)}
-            placeholder='what needs to be done?'
-            onKeyDown={handleKeyDown}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="what needs to be done?"
+            onKeyDown={addTodo}
           />
-          <TodoItems todos={todos} onDelete={deleteTodo} onChange={handleCheckboxChange} />
+          {loading ? (
+            <p>loading...</p>
+          ) : (
+            <TodoItems
+              todos={todos}
+              deleteTodo={deleteTodo}
+              onChange={handleCheckboxChange}
+            />
+          )}
         </div>
-      </div >
+      </div>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
